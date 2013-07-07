@@ -17,7 +17,7 @@ GIS in R
 Define filename and read file into matrix. Convert matrix into raster object using `rasterFromXYZ()` function. Add projection method for raster object, as this is required for hillShade plot (just keep this default).
 
 
-```{r GIS_in_R}
+```{r GIS_in_R, cache=TRUE}
 setwd("C:/Users/arevans/Google Drive/Work desktop/0Current work/R/CatsMiceOPCDataset") #laptop
 Filename <- "Felis_silvestris-1.780-uw_lrm1bemnewor150b.dat"
 InputG <- read.table(Filename, header=FALSE, sep=",", na.strings="NA", dec=".", strip.white=TRUE)
@@ -27,20 +27,19 @@ projection(RasterG) <- "+proj=eqc +lat_ts=0"
 
 Create some initial plots of the raster object.
 
-```{r GIS_Plot}
+```{r GIS_Plot, cache=TRUE}
 plot(x = RasterG, col = grey(0:100/100))
 plot(x = RasterG, col = terrain.colors(255))
 ```
 
 Calculate slope and aspect maps using `terrain` function. Use these maps to create a hillShade object, then plot it and overlay it with a topographic map. 
 
-```{r GIS_hillShade}
+```{r GIS_hillShade, cache=TRUE}
 RasterS <- terrain(RasterG, opt='slope')
 RasterA <- terrain(RasterG, opt='aspect')
 RasterH <- hillShade(RasterS, RasterA, 35, 335)
 plot(RasterH, col=grey(0:100/100), legend=FALSE)
 plot(RasterG, col=rev(terrain.colors(255, alpha=0.35)), add=TRUE)
-
 ```
 
 Dental Complexity
@@ -48,8 +47,7 @@ Dental Complexity
 
 Reclassify this aspect map using the `reclassify` function so that orientations from 0 to 22.5º and 337.5 to 360º are 1 (north), 22.5 to 67.5º are 2(north-east), etc. The function `Define_rcl` creates the reclassification matrix for `NoCat` categories (default = 8) needed as input for the `reclassify` function. 
 
-```{r rcl}
-
+```{r rcl, cache=TRUE}
 Define_rcl <- function (NoCat = 8) {
   rcl <- matrix(nrow = NoCat+1, ncol = 3)
   CatSize <- 360 / NoCat
@@ -61,13 +59,11 @@ Define_rcl <- function (NoCat = 8) {
 
 rcl <- Define_rcl(8)
 rcl
-
 ```
 
 Create raster `RasterAD` that shows aspect of surface in degrees, then reclassify it based on `rcl` matrix. Plot the aspect degrees and reclassified aspect maps.
 
-```{r Aspect_Plot}
-
+```{r Aspect_Plot, cache=TRUE}
 RasterAD <- terrain(RasterG, opt='aspect', unit='degrees')
 
 plot(RasterAD, col=heat.colors(255))
@@ -76,23 +72,19 @@ RasterADC <- reclassify(RasterAD,rcl)
 
 aspect.colors <- colorRampPalette(c("yellow","lightblue","blue","lightgreen","darkgreen","purple", "red", "brown"), space = "rgb")
 plot(RasterADC, col=aspect.colors(255))
-
 ```
 
 The aspect map of each direction (e.g. north) can be clumped to show all discrete patches of surface that face the same direction. The `freq` function shows the size (in pixels) of each discrete patch for that direction.
 
-```{r Clump}
-
+```{r Clump, cache=TRUE}
 RasterC1 <- clump(RasterADC==1,directions=4,gaps=FALSE)
 plot(RasterC1)
 freq(RasterC1)
-
 ```
 
 The `ClumpAspect` function calculates the clump map for all `NoCat` directions and creates a raster stack as output.
 
-```{r ClumpAspect}
-
+```{r ClumpAspect, cache=TRUE}
 ClumpAspect <- function(RasterADC, NoCat) {
   result <- 0
   for (i in 1:NoCat) {
@@ -108,14 +100,12 @@ ClumpAspect <- function(RasterADC, NoCat) {
 NoCat <- 8
 RasterC <- ClumpAspect(RasterADC, NoCat)
 plot(RasterC)
-
-
 ```
 
-The `CombileClumpData` function calculates the sizes of all clumps for the stack of clump raster maps and outputs a data frame with all of the raw values.
+The `CompileClumpData` function calculates the sizes of all clumps for the stack of clump raster maps and outputs a data frame with all of the raw values.
 
-```{r CombileClumpData}
-
+```{r CombileClumpData, cache=TRUE}
+# Must modify to allow for NoCat != 8
 CompileClumpData <- function(ClumpsOutput) {
   result <- 0
   ClumpsFreq <- freq(ClumpsOutput)
@@ -150,26 +140,22 @@ CompileClumpData <- function(ClumpsOutput) {
 }
 
 ClumpResults <- CompileClumpData(RasterC)
-
 ```
 
 The number of aspect clumps, or orientation patch count (OPC) of this map can be calculated. Only patches above a minimum size of `MinClumpSize` are counted.
 
-```{r OPC_single_map}
-
+```{r OPC_single_raster, cache=TRUE}
 MinClumpSize <- 2 #Only count clumps larger than MinClumpSize pixels in size
 OPCClumps <- subset(ClumpResults, ClumpResults[,2] > MinClumpSize)
 OPCClumps <- na.omit(OPCClumps)
 OPC <- nrow(OPCClumps)
 
 OPC
-
 ```
 
 The summary statistics for patch size are calculated using the `OPCStats` function.
 
-```{r OPC_stats}
-
+```{r OPC_stats, cache=TRUE}
 OPCStats <- t(as.matrix(summary(OPCClumps$count)))
 OPCStats <- as.data.frame(OPCStats)
 OPCStats$SD <- sd(OPCClumps[,2])                          
@@ -177,7 +163,6 @@ OPCStats <- rbind(c(OPC,OPCStats))
 colnames(OPCStats)[1] <- "OPC"
 
 OPCStats
-
 ```
 
 OPC Function
@@ -185,8 +170,7 @@ OPC Function
 
 The function `OPCCalc` takes a topographic raster map and carries out OPC calculation, outputting OPC statistics.
 
-```{r OPCCalc}
-
+```{r OPCCalc, cache=TRUE}
 OPCCalc <- function(RasterG, NoCat=8, MinClumpSize=2) {
   RasterAD <- terrain(RasterG, opt='aspect',unit='degrees')
   rcl <- Define_rcl(NoCat)
@@ -207,16 +191,14 @@ OPCCalc <- function(RasterG, NoCat=8, MinClumpSize=2) {
 }
 
 OPCCalc(RasterG)
-
 ```
 
-OPCR
+OPCR Function
 --------------
 
 The calculation of morphological complexity can be repeated to take into account differences in orientation of the grid around the vertical z axis, i.e. if the grid were rotated around the vertical axis, the boundaries of the directions would differ. OPCR is the mean of the OPC calculation repeated `NoRot` times. 
 
-```{r OPCRCalc}
-
+```{r OPCRCalc, cache=TRUE}
 Define_rclR <- function (NoCat, NoRot, CurrRot) {
   rcl <- matrix(nrow = NoCat+1, ncol = 3)
   CatSize <- 360 / NoCat
@@ -272,7 +254,6 @@ OPCRCalc <- function(RasterGrid, NoCat=8, MinClumpSize=2, NoRot=8, Plot=FALSE) {
 }
 
 OPCRCalc(RasterG)
-
 ```
 
 
@@ -281,7 +262,7 @@ OPCR for All Files in Directory
 
 The OPCR procedure can be carried out for all files in the current working directory. The results will be compiled into a dataframe.
 
-```{r RunOPCRDir}
+```{r RunOPCRDir, cache=TRUE}
 setwd("C:/Users/arevans/Google Drive/Work desktop/0Current work/R/CatsMiceOPCDataset") #laptop
 RunOPCRDir <- function(NoCat=8, MinClumpSize=2, NoRot=8, MaxFiles=0, Plot=FALSE) {
   Filenames <- list.files(pattern = "\\.dat$")
@@ -310,5 +291,4 @@ OPCRResults <- RunOPCRDir(MaxFiles = 4)
 OPCRResults <- na.omit(OPCRResults)
 
 OPCRResults
-
 ```

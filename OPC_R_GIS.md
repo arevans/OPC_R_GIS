@@ -92,7 +92,6 @@ Reclassify this aspect map using the `reclassify` function so that orientations 
 
 
 ```r
-
 Define_rcl <- function(NoCat = 8) {
     rcl <- matrix(nrow = NoCat + 1, ncol = 3)
     CatSize <- 360/NoCat
@@ -125,7 +124,6 @@ Create raster `RasterAD` that shows aspect of surface in degrees, then reclassif
 
 
 ```r
-
 RasterAD <- terrain(RasterG, opt = "aspect", unit = "degrees")
 
 plot(RasterAD, col = heat.colors(255))
@@ -149,7 +147,6 @@ The aspect map of each direction (e.g. north) can be clumped to show all discret
 
 
 ```r
-
 RasterC1 <- clump(RasterADC == 1, directions = 4, gaps = FALSE)
 plot(RasterC1)
 ```
@@ -175,7 +172,6 @@ The `ClumpAspect` function calculates the clump map for all `NoCat` directions a
 
 
 ```r
-
 ClumpAspect <- function(RasterADC, NoCat) {
     result <- 0
     for (i in 1:NoCat) {
@@ -198,16 +194,12 @@ plot(RasterC)
 
 ![plot of chunk ClumpAspect](figure/ClumpAspect1.png) ![plot of chunk ClumpAspect](figure/ClumpAspect2.png) 
 
-```r
 
-```
-
-
-The `CombileClumpData` function calculates the sizes of all clumps for the stack of clump raster maps and outputs a data frame with all of the raw values.
+The `CompileClumpData` function calculates the sizes of all clumps for the stack of clump raster maps and outputs a data frame with all of the raw values.
 
 
 ```r
-
+# Must modify to allow for NoCat != 8
 CompileClumpData <- function(ClumpsOutput) {
     result <- 0
     ClumpsFreq <- freq(ClumpsOutput)
@@ -249,7 +241,6 @@ The number of aspect clumps, or orientation patch count (OPC) of this map can be
 
 
 ```r
-
 MinClumpSize <- 2  #Only count clumps larger than MinClumpSize pixels in size
 OPCClumps <- subset(ClumpResults, ClumpResults[, 2] > MinClumpSize)
 OPCClumps <- na.omit(OPCClumps)
@@ -267,7 +258,6 @@ The summary statistics for patch size are calculated using the `OPCStats` functi
 
 
 ```r
-
 OPCStats <- t(as.matrix(summary(OPCClumps$count)))
 OPCStats <- as.data.frame(OPCStats)
 OPCStats$SD <- sd(OPCClumps[, 2])
@@ -290,7 +280,6 @@ The function `OPCCalc` takes a topographic raster map and carries out OPC calcul
 
 
 ```r
-
 OPCCalc <- function(RasterG, NoCat = 8, MinClumpSize = 2) {
     RasterAD <- terrain(RasterG, opt = "aspect", unit = "degrees")
     rcl <- Define_rcl(NoCat)
@@ -319,14 +308,13 @@ OPCCalc(RasterG)
 ```
 
 
-OPCR
+OPCR Function
 --------------
 
 The calculation of morphological complexity can be repeated to take into account differences in orientation of the grid around the vertical z axis, i.e. if the grid were rotated around the vertical axis, the boundaries of the directions would differ. OPCR is the mean of the OPC calculation repeated `NoRot` times. 
 
 
 ```r
-
 Define_rclR <- function(NoCat, NoRot, CurrRot) {
     rcl <- matrix(nrow = NoCat + 1, ncol = 3)
     CatSize <- 360/NoCat

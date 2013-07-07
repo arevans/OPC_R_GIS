@@ -246,8 +246,7 @@ plot(RasterG, col = rev(terrain.colors(255, alpha = 0.35)), add = TRUE)
 
 <p>Reclassify this aspect map using the <code>reclassify</code> function so that orientations from 0 to 22.5º and 337.5 to 360º are 1 (north), 22.5 to 67.5º are 2(north-east), etc. The function <code>Define_rcl</code> creates the reclassification matrix for <code>NoCat</code> categories (default = 8) needed as input for the <code>reclassify</code> function. </p>
 
-<pre><code class="r">
-Define_rcl &lt;- function(NoCat = 8) {
+<pre><code class="r">Define_rcl &lt;- function(NoCat = 8) {
     rcl &lt;- matrix(nrow = NoCat + 1, ncol = 3)
     CatSize &lt;- 360/NoCat
     rcl[, 1] &lt;- c(0, seq(from = CatSize/2, to = 360 - (CatSize/2), by = CatSize))
@@ -275,8 +274,7 @@ rcl
 
 <p>Create raster <code>RasterAD</code> that shows aspect of surface in degrees, then reclassify it based on <code>rcl</code> matrix. Plot the aspect degrees and reclassified aspect maps.</p>
 
-<pre><code class="r">
-RasterAD &lt;- terrain(RasterG, opt = &quot;aspect&quot;, unit = &quot;degrees&quot;)
+<pre><code class="r">RasterAD &lt;- terrain(RasterG, opt = &quot;aspect&quot;, unit = &quot;degrees&quot;)
 
 plot(RasterAD, col = heat.colors(255))
 </code></pre>
@@ -295,8 +293,7 @@ plot(RasterADC, col = aspect.colors(255))
 
 <p>The aspect map of each direction (e.g. north) can be clumped to show all discrete patches of surface that face the same direction. The <code>freq</code> function shows the size (in pixels) of each discrete patch for that direction.</p>
 
-<pre><code class="r">
-RasterC1 &lt;- clump(RasterADC == 1, directions = 4, gaps = FALSE)
+<pre><code class="r">RasterC1 &lt;- clump(RasterADC == 1, directions = 4, gaps = FALSE)
 plot(RasterC1)
 </code></pre>
 
@@ -316,8 +313,7 @@ plot(RasterC1)
 
 <p>The <code>ClumpAspect</code> function calculates the clump map for all <code>NoCat</code> directions and creates a raster stack as output.</p>
 
-<pre><code class="r">
-ClumpAspect &lt;- function(RasterADC, NoCat) {
+<pre><code class="r">ClumpAspect &lt;- function(RasterADC, NoCat) {
     result &lt;- 0
     for (i in 1:NoCat) {
         RasterClump &lt;- clump(RasterADC == i, directions = 4, gaps = FALSE)
@@ -339,12 +335,9 @@ plot(RasterC)
 
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAAH4CAMAAACR9g9NAAAAA1BMVEX///+nxBvIAAAACXBIWXMAAAsSAAALEgHS3X78AAABDUlEQVR4nO3BMQEAAADCoPVPbQwfoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOBv4mUAASET0xEAAAAASUVORK5CYII=" alt="plot of chunk ClumpAspect"/> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfgAAAH4CAMAAACR9g9NAAABiVBMVEX9/v0AAAAAADkAAGUAOTkAOY8AZo8AZrUApgAEpwAJqQAPqwAVrQAarwAcsAAgsQAmswAttQAztwA5AAA5ADk5AGU5OQA5OWU5ZrU5j9o5uQBAvABDvQBHvgBOwABTwQBawwBcxABdxABhxQBjxgBlAABlADllAGVlOY9lZgBlZrVltbVltdpltf1oxwBwyQB3ywB5zAB/zQCHzwCN0QCPOQCPOTmPOWWPZmWPZo+PtY+P0QCP29qP2/2X0wCf1QCn1wCw2QC1ZgC1Zjm1ZmW1j4+12/21/v222wC/3QDI3wDR4QDajzna29ra4wDa/rXa/v3j5QDm2Q7m2g3m4QXm5ALnyiLnzxvn1BTovzbowjHowy/oxirpuUXpuz7qs1zqtFTqtk3qtk/rsWvrsmHrsmPssXLssXjssXrssoHts4nttI/ttZHutpbuuJruuZ7uvKbvv63vw7XvxLfwyL3wzcXw0cvw0s3x2NXx3tzy5eTy7Ozy8vL9tWX924/927X9/rX9/tr9/v2SONEPAAAAg3RSTlP/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////ACKHqaAAAAAJcEhZcwAACxIAAAsSAdLdfvwAAB21SURBVHic7Z2JfxTFtsczxEjccImiyBP0SRTxjvrUoDyNSkDjMmi8rgi4xKuiF664PVEz40z/5a+XhK6u7q6p5ZzqU13n9+EDSacP55fznaquru6uXkhYUWqhawOsbsTgIxWDj1QMPlIx+EjF4COVC/jJvetOP/cltY/Z2mCw35sXlebUa2MwGMIlQwQ/WdkXAvjR4uZ0FbCi9lL7HO9bHy9ugiWzBD/KWklqdJxXbbTv4ODmtcHS1jj9YmmraEOTe/+3+xav4TNV9+D1fI46B59++lJ/gtH18WA4WRnm2w+l2/9+I6HQ1ev5nK113dXr+RxB9qB24EdLW0kifEIXN1OLmdH0I7mxPzsaZZ/N7sFr+UxL27FNzXqC9kzWLX62ln0SC3+l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" alt="plot of chunk ClumpAspect"/> </p>
 
-<pre><code class="r">
-</code></pre>
+<p>The <code>CompileClumpData</code> function calculates the sizes of all clumps for the stack of clump raster maps and outputs a data frame with all of the raw values.</p>
 
-<p>The <code>CombileClumpData</code> function calculates the sizes of all clumps for the stack of clump raster maps and outputs a data frame with all of the raw values.</p>
-
-<pre><code class="r">
+<pre><code class="r"># Must modify to allow for NoCat != 8
 CompileClumpData &lt;- function(ClumpsOutput) {
     result &lt;- 0
     ClumpsFreq &lt;- freq(ClumpsOutput)
@@ -383,8 +376,7 @@ ClumpResults &lt;- CompileClumpData(RasterC)
 
 <p>The number of aspect clumps, or orientation patch count (OPC) of this map can be calculated. Only patches above a minimum size of <code>MinClumpSize</code> are counted.</p>
 
-<pre><code class="r">
-MinClumpSize &lt;- 2  #Only count clumps larger than MinClumpSize pixels in size
+<pre><code class="r">MinClumpSize &lt;- 2  #Only count clumps larger than MinClumpSize pixels in size
 OPCClumps &lt;- subset(ClumpResults, ClumpResults[, 2] &gt; MinClumpSize)
 OPCClumps &lt;- na.omit(OPCClumps)
 OPC &lt;- nrow(OPCClumps)
@@ -397,8 +389,7 @@ OPC
 
 <p>The summary statistics for patch size are calculated using the <code>OPCStats</code> function.</p>
 
-<pre><code class="r">
-OPCStats &lt;- t(as.matrix(summary(OPCClumps$count)))
+<pre><code class="r">OPCStats &lt;- t(as.matrix(summary(OPCClumps$count)))
 OPCStats &lt;- as.data.frame(OPCStats)
 OPCStats$SD &lt;- sd(OPCClumps[, 2])
 OPCStats &lt;- rbind(c(OPC, OPCStats))
@@ -415,8 +406,7 @@ OPCStats
 
 <p>The function <code>OPCCalc</code> takes a topographic raster map and carries out OPC calculation, outputting OPC statistics.</p>
 
-<pre><code class="r">
-OPCCalc &lt;- function(RasterG, NoCat = 8, MinClumpSize = 2) {
+<pre><code class="r">OPCCalc &lt;- function(RasterG, NoCat = 8, MinClumpSize = 2) {
     RasterAD &lt;- terrain(RasterG, opt = &quot;aspect&quot;, unit = &quot;degrees&quot;)
     rcl &lt;- Define_rcl(NoCat)
     RasterADC &lt;- reclassify(RasterAD, rcl)
@@ -442,12 +432,11 @@ OPCCalc(RasterG)
 ## 1  37    3       4     22  221     130 1940 457.6
 </code></pre>
 
-<h2>OPCR</h2>
+<h2>OPCR Function</h2>
 
 <p>The calculation of morphological complexity can be repeated to take into account differences in orientation of the grid around the vertical z axis, i.e. if the grid were rotated around the vertical axis, the boundaries of the directions would differ. OPCR is the mean of the OPC calculation repeated <code>NoRot</code> times. </p>
 
-<pre><code class="r">
-Define_rclR &lt;- function(NoCat, NoRot, CurrRot) {
+<pre><code class="r">Define_rclR &lt;- function(NoCat, NoRot, CurrRot) {
     rcl &lt;- matrix(nrow = NoCat + 1, ncol = 3)
     CatSize &lt;- 360/NoCat
     OffsetSize &lt;- CatSize/NoRot
