@@ -1,5 +1,11 @@
-base
 igraph
-knitr
 raster
 sp
+knitr
+stats
+graphics
+grDevices
+utils
+datasets
+methods
+base

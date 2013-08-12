@@ -18,7 +18,8 @@ Define filename and read file into matrix. Convert matrix into raster object usi
 
 
 ```{r GIS_in_R, cache=TRUE}
-setwd("C:/Users/arevans/Google Drive/Work desktop/0Current work/R/CatsMiceOPCDataset") #laptop
+setwd("E:/Google Drive/Work desktop/0Current work/R/CatsMiceOPCDataset") #desktop
+#setwd("C:/Users/arevans/Google Drive/Work desktop/0Current work/R/CatsMiceOPCDataset") #laptop
 Filename <- "Felis_silvestris-1.780-uw_lrm1bemnewor150b.dat"
 InputG <- read.table(Filename, header=FALSE, sep=",", na.strings="NA", dec=".", strip.white=TRUE)
 RasterG <- rasterFromXYZ(InputG)
