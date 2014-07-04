@@ -15,7 +15,15 @@ require(raster)
 ```
 
 ```
+## Warning: package 'raster' was built under R version 2.15.3
+```
+
+```
 ## Loading required package: sp
+```
+
+```
+## Warning: package 'sp' was built under R version 2.15.3
 ```
 
 ```r
@@ -27,11 +35,15 @@ require(igraph)
 ```
 
 ```
+## Warning: package 'igraph' was built under R version 2.15.3
+```
+
+```
 ## Attaching package: 'igraph'
 ```
 
 ```
-## The following object is masked from 'package:raster':
+## The following object(s) are masked from 'package:raster':
 ## 
 ## edge
 ```
@@ -46,7 +58,9 @@ Define filename and read file into matrix. Convert matrix into raster object usi
 
 
 ```r
-setwd("C:/Users/arevans/Google Drive/Work desktop/0Current work/R/CatsMiceOPCDataset")  #laptop
+setwd("E:/Google Drive/Work desktop/0Current work/R/CatsMiceOPCDataset")  #desktop
+# setwd('C:/Users/arevans/Google Drive/Work desktop/0Current
+# work/R/CatsMiceOPCDataset') #laptop
 Filename <- "Felis_silvestris-1.780-uw_lrm1bemnewor150b.dat"
 InputG <- read.table(Filename, header = FALSE, sep = ",", na.strings = "NA", 
     dec = ".", strip.white = TRUE)
@@ -192,7 +206,7 @@ RasterC <- ClumpAspect(RasterADC, NoCat)
 plot(RasterC)
 ```
 
-![plot of chunk ClumpAspect](figure/ClumpAspect1.png) ![plot of chunk ClumpAspect](figure/ClumpAspect2.png) 
+![plot of chunk ClumpAspect](figure/ClumpAspect.png) 
 
 
 The `CompileClumpData` function calculates the sizes of all clumps for the stack of clump raster maps and outputs a data frame with all of the raw values.
@@ -363,7 +377,7 @@ OPCRCalc(RasterG)
 
 ```
 ##      OPC     Min. X1st.Qu.   Median     Mean X3rd.Qu.     Max.       SD 
-##   44.625    3.000    4.531   14.000  184.375  121.375 1747.500  392.702
+##   44.625    3.000    4.531   14.000  184.375  121.375 1747.500  392.702 
 ```
 
 
@@ -376,6 +390,13 @@ The OPCR procedure can be carried out for all files in the current working direc
 
 ```r
 setwd("C:/Users/arevans/Google Drive/Work desktop/0Current work/R/CatsMiceOPCDataset")  #laptop
+```
+
+```
+## Error: cannot change working directory
+```
+
+```r
 RunOPCRDir <- function(NoCat = 8, MinClumpSize = 2, NoRot = 8, MaxFiles = 0, 
     Plot = FALSE) {
     Filenames <- list.files(pattern = "\\.dat$")
@@ -402,21 +423,26 @@ RunOPCRDir <- function(NoCat = 8, MinClumpSize = 2, NoRot = 8, MaxFiles = 0,
 }
 
 OPCRResults <- RunOPCRDir(MaxFiles = 4)
+```
+
+```
+## Error: arguments imply differing number of rows: 0, 1
+```
+
+```r
 OPCRResults <- na.omit(OPCRResults)
+```
+
+```
+## Error: object 'OPCRResults' not found
+```
+
+```r
 
 OPCRResults
 ```
 
 ```
-##                                              Filenames   OPCR Min.
-## 1   Acinonyx_jubatus-HELU31-lrm1c_t0.05,0.015b150b.dat  36.50    3
-## 2 Acinonyx_jubatus-HELU31-urp4m1c_t0.05,0.015b150b.dat  52.62    3
-## 3 Aethomys_hindei-A584096-lr-rotc_t0.04,0.010b150b.dat 222.25    3
-## 4 Aethomys_hindei-A584096-ur-rotc_t0.04,0.010b150b.dat 241.62    3
-##   X1st.Qu. Median   Mean X3rd.Qu.   Max.    SD
-## 1    3.688  15.44 186.38   128.78 1400.0 366.6
-## 2    7.125  16.12  94.56    73.62 1041.2 203.2
-## 3    5.500  13.75  23.26    31.61  174.8  26.2
-## 4    4.375  10.44  20.19    23.29  206.8  27.6
+## Error: object 'OPCRResults' not found
 ```
 
