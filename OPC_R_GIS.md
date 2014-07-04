@@ -202,35 +202,18 @@ The `CompileClumpData` function calculates the sizes of all clumps for the stack
 # Must modify to allow for NoCat != 8
 CompileClumpData <- function(ClumpsOutput) {
     result <- 0
+    ClumpsFreq <- freq(RasterC)
     ClumpsFreq <- freq(ClumpsOutput)
     NoCat <- length(ClumpsFreq)
-    
-    temp1 <- as.data.frame(ClumpsFreq$clumps1)
-    temp1$Cat <- rep(1, length(temp1$value))
-    temp2 <- as.data.frame(ClumpsFreq$clumps2)
-    temp2$Cat <- rep(2, length(temp2$value))
-    temp3 <- as.data.frame(ClumpsFreq$clumps3)
-    temp3$Cat <- rep(3, length(temp3$value))
-    temp4 <- as.data.frame(ClumpsFreq$clumps4)
-    temp4$Cat <- rep(4, length(temp4$value))
-    temp5 <- as.data.frame(ClumpsFreq$clumps5)
-    temp5$Cat <- rep(5, length(temp5$value))
-    temp6 <- as.data.frame(ClumpsFreq$clumps6)
-    temp6$Cat <- rep(6, length(temp6$value))
-    temp7 <- as.data.frame(ClumpsFreq$clumps7)
-    temp7$Cat <- rep(7, length(temp7$value))
-    temp8 <- as.data.frame(ClumpsFreq$clumps8)
-    temp8$Cat <- rep(8, length(temp8$value))
-    
-    tempa <- merge(temp1, temp2, all = TRUE)
-    tempa <- merge(tempa, temp3, all = TRUE)
-    tempa <- merge(tempa, temp4, all = TRUE)
-    tempa <- merge(tempa, temp5, all = TRUE)
-    tempa <- merge(tempa, temp6, all = TRUE)
-    tempa <- merge(tempa, temp7, all = TRUE)
-    tempa <- merge(tempa, temp8, all = TRUE)
-    
-    result <- tempa
+    for (i in 1:NoCat) {
+        ClumpsFreq[[i]] <- cbind(c(rep(i, (length(ClumpsFreq[[i]])/2))), ClumpsFreq[[i]])
+    }
+    ClumpResults <- rbind(ClumpsFreq[[1]], ClumpsFreq[[2]])
+    for (j in 3:NoCat) {
+        ClumpResults <- rbind(ClumpResults, ClumpsFreq[[j]])
+    }
+    colnames(ClumpResults)[1] <- "Cat"
+    result <- data.frame(ClumpResults)
 }
 
 ClumpResults <- CompileClumpData(RasterC)
@@ -242,7 +225,7 @@ The number of aspect clumps, or orientation patch count (OPC) of this map can be
 
 ```r
 MinClumpSize <- 2  #Only count clumps larger than MinClumpSize pixels in size
-OPCClumps <- subset(ClumpResults, ClumpResults[, 2] > MinClumpSize)
+OPCClumps <- subset(ClumpResults, ClumpResults$count > MinClumpSize)
 OPCClumps <- na.omit(OPCClumps)
 OPC <- nrow(OPCClumps)
 
@@ -260,7 +243,7 @@ The summary statistics for patch size are calculated using the `OPCStats` functi
 ```r
 OPCStats <- t(as.matrix(summary(OPCClumps$count)))
 OPCStats <- as.data.frame(OPCStats)
-OPCStats$SD <- sd(OPCClumps[, 2])
+OPCStats$SD <- sd(OPCClumps$count)
 OPCStats <- rbind(c(OPC, OPCStats))
 colnames(OPCStats)[1] <- "OPC"
 
@@ -287,14 +270,14 @@ OPCCalc <- function(RasterG, NoCat = 8, MinClumpSize = 2) {
     RasterC <- ClumpAspect(RasterADC, NoCat)
     ClumpResults <- CompileClumpData(RasterC)
     
-    OPCClumps <- subset(ClumpResults, ClumpResults[, 2] > MinClumpSize)
+    OPCClumps <- subset(ClumpResults, ClumpResults$count > MinClumpSize)
     OPCClumps <- na.omit(OPCClumps)
     OPC <- nrow(OPCClumps)
     OPCData <- as.data.frame(OPC)
     
     OPCStats <- t(as.matrix(summary(OPCClumps$count)))
     OPCStats <- as.data.frame(OPCStats)
-    OPCStats$SD <- sd(OPCClumps[, 2])
+    OPCStats$SD <- sd(OPCClumps$count)
     OPCStats <- merge(OPCData, OPCStats)
     return(OPCStats)
 }
@@ -356,14 +339,14 @@ OPCRCalc <- function(RasterGrid, NoCat = 8, MinClumpSize = 2, NoRot = 8, Plot = 
         
         ClumpResults <- CompileClumpData(RasterClumped)
         
-        OPCClumps <- subset(ClumpResults, ClumpResults[, 2] > MinClumpSize)
+        OPCClumps <- subset(ClumpResults, ClumpResults$count > MinClumpSize)
         OPCClumps <- na.omit(OPCClumps)
         OPC <- nrow(OPCClumps)
         OPCData <- as.data.frame(OPC)
         
         OPCStats <- t(as.matrix(summary(OPCClumps$count)))
         OPCStats <- as.data.frame(OPCStats)
-        OPCStats$SD <- sd(OPCClumps[, 2])
+        OPCStats$SD <- sd(OPCClumps$count)
         OPCStats <- merge(OPCData, OPCStats)
         
         OPCResultsRot[i, 1] <- i

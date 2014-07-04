@@ -340,35 +340,18 @@ plot(RasterC)
 <pre><code class="r"># Must modify to allow for NoCat != 8
 CompileClumpData &lt;- function(ClumpsOutput) {
     result &lt;- 0
+    ClumpsFreq &lt;- freq(RasterC)
     ClumpsFreq &lt;- freq(ClumpsOutput)
     NoCat &lt;- length(ClumpsFreq)
-
-    temp1 &lt;- as.data.frame(ClumpsFreq$clumps1)
-    temp1$Cat &lt;- rep(1, length(temp1$value))
-    temp2 &lt;- as.data.frame(ClumpsFreq$clumps2)
-    temp2$Cat &lt;- rep(2, length(temp2$value))
-    temp3 &lt;- as.data.frame(ClumpsFreq$clumps3)
-    temp3$Cat &lt;- rep(3, length(temp3$value))
-    temp4 &lt;- as.data.frame(ClumpsFreq$clumps4)
-    temp4$Cat &lt;- rep(4, length(temp4$value))
-    temp5 &lt;- as.data.frame(ClumpsFreq$clumps5)
-    temp5$Cat &lt;- rep(5, length(temp5$value))
-    temp6 &lt;- as.data.frame(ClumpsFreq$clumps6)
-    temp6$Cat &lt;- rep(6, length(temp6$value))
-    temp7 &lt;- as.data.frame(ClumpsFreq$clumps7)
-    temp7$Cat &lt;- rep(7, length(temp7$value))
-    temp8 &lt;- as.data.frame(ClumpsFreq$clumps8)
-    temp8$Cat &lt;- rep(8, length(temp8$value))
-
-    tempa &lt;- merge(temp1, temp2, all = TRUE)
-    tempa &lt;- merge(tempa, temp3, all = TRUE)
-    tempa &lt;- merge(tempa, temp4, all = TRUE)
-    tempa &lt;- merge(tempa, temp5, all = TRUE)
-    tempa &lt;- merge(tempa, temp6, all = TRUE)
-    tempa &lt;- merge(tempa, temp7, all = TRUE)
-    tempa &lt;- merge(tempa, temp8, all = TRUE)
-
-    result &lt;- tempa
+    for (i in 1:NoCat) {
+        ClumpsFreq[[i]] &lt;- cbind(c(rep(i, (length(ClumpsFreq[[i]])/2))), ClumpsFreq[[i]])
+    }
+    ClumpResults &lt;- rbind(ClumpsFreq[[1]], ClumpsFreq[[2]])
+    for (j in 3:NoCat) {
+        ClumpResults &lt;- rbind(ClumpResults, ClumpsFreq[[j]])
+    }
+    colnames(ClumpResults)[1] &lt;- &quot;Cat&quot;
+    result &lt;- data.frame(ClumpResults)
 }
 
 ClumpResults &lt;- CompileClumpData(RasterC)
@@ -377,7 +360,7 @@ ClumpResults &lt;- CompileClumpData(RasterC)
 <p>The number of aspect clumps, or orientation patch count (OPC) of this map can be calculated. Only patches above a minimum size of <code>MinClumpSize</code> are counted.</p>
 
 <pre><code class="r">MinClumpSize &lt;- 2  #Only count clumps larger than MinClumpSize pixels in size
-OPCClumps &lt;- subset(ClumpResults, ClumpResults[, 2] &gt; MinClumpSize)
+OPCClumps &lt;- subset(ClumpResults, ClumpResults$count &gt; MinClumpSize)
 OPCClumps &lt;- na.omit(OPCClumps)
 OPC &lt;- nrow(OPCClumps)
 
@@ -391,7 +374,7 @@ OPC
 
 <pre><code class="r">OPCStats &lt;- t(as.matrix(summary(OPCClumps$count)))
 OPCStats &lt;- as.data.frame(OPCStats)
-OPCStats$SD &lt;- sd(OPCClumps[, 2])
+OPCStats$SD &lt;- sd(OPCClumps$count)
 OPCStats &lt;- rbind(c(OPC, OPCStats))
 colnames(OPCStats)[1] &lt;- &quot;OPC&quot;
 
@@ -413,14 +396,14 @@ OPCStats
     RasterC &lt;- ClumpAspect(RasterADC, NoCat)
     ClumpResults &lt;- CompileClumpData(RasterC)
 
-    OPCClumps &lt;- subset(ClumpResults, ClumpResults[, 2] &gt; MinClumpSize)
+    OPCClumps &lt;- subset(ClumpResults, ClumpResults$count &gt; MinClumpSize)
     OPCClumps &lt;- na.omit(OPCClumps)
     OPC &lt;- nrow(OPCClumps)
     OPCData &lt;- as.data.frame(OPC)
 
     OPCStats &lt;- t(as.matrix(summary(OPCClumps$count)))
     OPCStats &lt;- as.data.frame(OPCStats)
-    OPCStats$SD &lt;- sd(OPCClumps[, 2])
+    OPCStats$SD &lt;- sd(OPCClumps$count)
     OPCStats &lt;- merge(OPCData, OPCStats)
     return(OPCStats)
 }
@@ -477,14 +460,14 @@ OPCRCalc &lt;- function(RasterGrid, NoCat = 8, MinClumpSize = 2, NoRot = 8, Plot
 
         ClumpResults &lt;- CompileClumpData(RasterClumped)
 
-        OPCClumps &lt;- subset(ClumpResults, ClumpResults[, 2] &gt; MinClumpSize)
+        OPCClumps &lt;- subset(ClumpResults, ClumpResults$count &gt; MinClumpSize)
         OPCClumps &lt;- na.omit(OPCClumps)
         OPC &lt;- nrow(OPCClumps)
         OPCData &lt;- as.data.frame(OPC)
 
         OPCStats &lt;- t(as.matrix(summary(OPCClumps$count)))
         OPCStats &lt;- as.data.frame(OPCStats)
-        OPCStats$SD &lt;- sd(OPCClumps[, 2])
+        OPCStats$SD &lt;- sd(OPCClumps$count)
         OPCStats &lt;- merge(OPCData, OPCStats)
 
         OPCResultsRot[i, 1] &lt;- i
